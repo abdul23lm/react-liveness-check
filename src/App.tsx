@@ -150,13 +150,13 @@ function App() {
           </div>
           <div className="flex justify-center mb-4">
             <button
-              className="mx-2 mt-5 w-1/4 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg outline-none"
+              className="mx-2 mt-5 w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg outline-none"
               onClick={handleCloseModal}
             >
               Batal
             </button>
             <button
-              className="mx-2 mt-5 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg outline-none"
+              className="mx-2 mt-5 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg outline-none"
               onClick={captureWebcamPhoto}
             >
               Capture
