@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const ImageUpload: React.FC<{
   onImageUpload: (base64Image: string) => void;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Switch from "react-switch";
 import ImageUpload from "./components/ImageUpload";
 import "./App.css";
@@ -8,8 +8,14 @@ function App() {
   const apiKey = import.meta.env.VITE_API_KEY;
   const apiUrl = import.meta.env.VITE_API_URL;
 
+  const [selectedOption, setSelectedOption] = useState("");
+
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [imageUploaded, setImageUploaded] = useState(false);
+
+  const [webcamActive, setWebcamActive] = useState(false);
+  const videoRef = useRef(null);
+
   const [isRequesting, setIsRequesting] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
@@ -31,9 +37,63 @@ function App() {
   }
   const livenessProbability = livenessResponse?.liveness?.probability || "N/A";
 
+  const handleOptionChange = (event) => {
+    setSelectedOption(event.target.value);
+    handleReset();
+  };
+
   const handleImageUpload = (base64Image: string) => {
     setUploadedImage(base64Image);
     setImageUploaded(true);
+  };
+
+  const activateWebcam = async () => {
+    try {
+      setWebcamActive(true);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      videoRef.current.srcObject = stream;
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.error("Error activating webcam:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (webcamActive) {
+      const mediaStream = videoRef.current.srcObject;
+
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+      setWebcamActive(false);
+    }
+  };
+
+  const captureWebcamPhoto = async () => {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const context = canvas.getContext("2d");
+
+      if (context) {
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const base64Image = canvas.toDataURL("image/jpeg");
+
+        setUploadedImage(base64Image);
+
+        setImageUploaded(true);
+        handleCloseModal();
+      } else {
+        console.error("Canvas context is not available.");
+      }
+    } catch (error) {
+      console.error("An error occurred during image capture:", error);
+    }
   };
 
   const handleAPIRequest = async () => {
@@ -78,12 +138,34 @@ function App() {
     setValidateAttribute(true);
     setValidateNFace(true);
     setIsDisabled(false);
+    setWebcamActive(false);
   };
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      <h1 className="text-4xl font-bold mb-4">Liveness Check</h1>
+      {webcamActive && (
+        <div className="webcam-modal bg-white p-5">
+          <div className="video-container">
+            <video ref={videoRef} autoPlay />
+          </div>
+          <div className="flex justify-center mb-4">
+            <button
+              className="mx-2 mt-5 w-1/4 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg outline-none"
+              onClick={handleCloseModal}
+            >
+              Batal
+            </button>
+            <button
+              className="mx-2 mt-5 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg outline-none"
+              onClick={captureWebcamPhoto}
+            >
+              Capture
+            </button>
+          </div>
+        </div>
+      )}
 
+      <h1 className="text-4xl font-bold mb-4">Liveness Check</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
         <div className="col-span-1 p-4">
           <h1 className="text-2xl font-bold mb-4">Conditions</h1>
@@ -162,9 +244,32 @@ function App() {
           </div>
         </div>
         <div className="col-span-1 p-4">
-          <h1 className="text-2xl font-bold mb-4">Upload Image</h1>
+          <h1 className="text-2xl font-bold mb-4">Image</h1>
+          <div className="mb-4">
+            <select
+              value={selectedOption}
+              onChange={handleOptionChange}
+              className="w-full py-3 px-3 rounded"
+            >
+              <option value="">Choose Source</option>
+              <option value="upload">Upload</option>
+              <option value="selfie">Selfie</option>
+            </select>
+          </div>
           <div className="mb-8">
-            <ImageUpload onImageUpload={handleImageUpload} />
+            {selectedOption === "upload" && (
+              <div className="mb-8">
+                <ImageUpload onImageUpload={handleImageUpload} />
+              </div>
+            )}
+            {selectedOption === "selfie" && (
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mb-4 w-full outline-none"
+                onClick={activateWebcam}
+              >
+                Activate Webcam
+              </button>
+            )}
           </div>
           {uploadedImage && (
             <img
@@ -175,7 +280,6 @@ function App() {
           )}
         </div>
 
-        {/* Right Column */}
         <div className="col-span-1 p-4">
           <h1 className="text-2xl font-bold mb-4">API Response</h1>
           <button
