@@ -89,8 +89,8 @@ function App() {
           <h1 className="text-2xl font-bold mb-4">Conditions</h1>
           <div className="mb-4 flex justify-between items-center">
             <label className="mr-2 text-left">
-              <b>Use Quality Check:</b> <br />
-              <small>
+              <b>1. Use Quality Check:</b> <br />
+              <small className="text-gray-300">
                 A flag to determine whether Image Quality (blur, dark,
                 grayscale) will be computed and return as result
               </small>
@@ -102,9 +102,9 @@ function App() {
           </div>
           <div className="mb-4 flex justify-between items-center">
             <label className="mr-2 text-left">
-              <b>Use Attribute:</b>
+              <b>2. Use Attribute:</b>
               <br />
-              <small>
+              <small className="text-gray-300">
                 A flag to determine whether Image Attribute (sunglasses, mask,
                 veil) will be detected and return as result
               </small>
@@ -116,9 +116,9 @@ function App() {
           </div>
           <div className="mb-4 flex justify-between items-center">
             <label className="mr-2 text-left">
-              <b>Validate Quality:</b>
+              <b>3. Validate Quality:</b>
               <br />
-              <small>
+              <small className="text-gray-300">
                 Determines whether Quality validation will be executed. The
                 validation consists of checking blur and dark with threshold,
                 and also checking whether the image is a black & white image
@@ -133,8 +133,8 @@ function App() {
           </div>
           <div className="mb-4 flex justify-between items-center">
             <label className="mr-2 text-left">
-              <b>Validate Attribute:</b> <br />
-              <small>
+              <b>4. Validate Attribute:</b> <br />
+              <small className="text-gray-300">
                 Determines whether Attribute validation will be executed. The
                 validation consists of checking whether sunglasses or mask is
                 detected in the input image.
@@ -147,11 +147,13 @@ function App() {
           </div>
           <div className="mb-4 flex justify-between items-center">
             <label className="mr-2 text-left">
-              <b>Validate NFace: </b>
+              <b>5. Validate NFace: </b>
               <br />
-              Determines whether the number of faces validation will be
-              executed. The validation checks whether the input image consists
-              of more than one face.
+              <small className="text-gray-300">
+                Determines whether the number of faces validation will be
+                executed. The validation checks whether the input image consists
+                of more than one face.
+              </small>
             </label>
             <Switch
               onChange={(checked) => setValidateNFace(checked)}
